@@ -7,7 +7,7 @@ from data.db_session import SqlAlchemyBase
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField
 from wtforms.validators import DataRequired
-from forms.user import RegisterForm
+from forms.user import RegisterForm, LoginForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -50,11 +50,7 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-class LoginForm(FlaskForm):
-    email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    remember_me = BooleanField('Запомнить меня')
-    submit = SubmitField('Войти')
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -85,11 +81,9 @@ def logout():
 
 
 @app.route("/")
-def index():
-    if current_user.is_authenticated:
-        return 'index'
-    else:
-        return redirect("/login")
+@app.route("/profile")
+def profile():
+        return render_template('profile.html')
 
 
 def main():
