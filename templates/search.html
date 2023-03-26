@@ -1,54 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 align="center">Каталог</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }}<br>
+    {{ form.name(class="form-control", type="text") }}<br>
+    {{ form.author.label }}<br>
+    {{ form.author(class="form-control", type="text") }}<br>
+    {{ form.submit(type="submit", class="btn btn-outline-success") }}
 
-{% for item in books%}
-<div class="container">
-  <div class="row g-0">
-    <div class="col col-sm-4">
-     <div class="head">
-      Название
-     </div>
-     <div class="content">
-        {{item.name}}
-     </div>
-    </div>
-    <div class="col">
-        <div class="head">
-      Цена
-     </div>
-      <div class="content">
-        {{item.price}}
-     </div>
-    </div>
-      <div class="col">
-        <div class="head">
-      Количество
-     </div>
-      <div class="content">
-        {{item.quantity}}
-     </div>
-    </div>
-    <div class="col">
-        <div class="head">
-      Купить
-     </div>
-     <div class="content">
-        {% if item.is_available %}
-        <div class="status">
-<!--            <a class="btn btn-outline-success" href="/" role="button">Добавить в корзину</a>-->
-            <!-- аргумент как часть пути -->
-            <form action="/add_to_basket/{{item.id}}/" method="POST">
-                <input type="submit" class="btn btn-outline-success" value="Добавить в корзину">
-            </form>
-        </div>
-         {% else %}
-       <div class="status">Нет в наличии</div>
-          {% endif %}
-     </div>
-    </div>
-  </div>
-</div>
-{% endfor %}
+</form>
 {% endblock %}
