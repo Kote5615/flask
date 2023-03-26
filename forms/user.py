@@ -17,3 +17,9 @@ class LoginForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+
+
+class SearchForm(FlaskForm):
+    name = TextAreaField('Название', validators=[DataRequired()])
+    author = TextAreaField('Автор', validators=[DataRequired()])
+    submit = SubmitField('Поиск')
