@@ -1,12 +1,9 @@
 from flask import Flask, render_template, redirect
 from data import db_session
 from data.users import User
-from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
-from data.db_session import SqlAlchemyBase
-
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField
-from wtforms.validators import DataRequired
+from data.books import Book
+from data.user_purchases import Purchase
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm
 
 app = Flask(__name__)
@@ -50,9 +47,6 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -83,7 +77,33 @@ def logout():
 @app.route("/")
 @app.route("/profile")
 def profile():
-        return render_template('profile.html')
+    return render_template('profile.html')
+
+
+@app.route('/add_to_basket/<index>/', methods=['POST'])
+@login_required
+def add_to_basket(index):
+    db_sess = db_session.create_session()
+    book = db_sess.query(Book).get(index)
+    book.quantity = book.quantity - 1
+    if book.quantity < 1:
+        book.quantity = 0
+        book.is_available = 0
+
+    purchase = Purchase(
+        user_id=current_user.get_id(),
+        book_id=index
+    )
+    db_sess.add(purchase)
+    db_sess.commit()
+    return redirect("/search")
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    db_sess = db_session.create_session()
+    books = db_sess.query(Book).all()
+    return render_template("search.html", books=books)
 
 
 def main():
