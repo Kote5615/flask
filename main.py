@@ -4,7 +4,7 @@ from data.users import User
 from data.books import Book
 from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
-from forms.user import RegisterForm, LoginForm, SearchForm
+from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm
 import calendar
 UPLOAD_FOLDER = 'static/icons/'
 app = Flask(__name__)
