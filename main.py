@@ -88,16 +88,19 @@ def profile():
 def add_to_basket(index, author, name):
     db_sess = db_session.create_session()
     book = db_sess.query(Book).get(index)
-    book.quantity = book.quantity - 1
-    if book.quantity < 1:
-        book.quantity = 0
-        book.is_available = 0
-
-    purchase = Purchase(
-        user_id=current_user.get_id(),
-        book_id=index
-    )
-    db_sess.add(purchase)
+    purchase = db_sess.query(Purchase).filter((Purchase.user_id == current_user.get_id()),
+                                              (Purchase.book_id == index)).first()
+    if purchase:
+        if book.quantity >= purchase.quantity + 1:
+            purchase.quantity = purchase.quantity + 1
+    else:
+        if book.quantity >= 1:
+            purchase = Purchase(
+                user_id=current_user.get_id(),
+                book_id=index,
+                quantity=1
+            )
+            db_sess.add(purchase)
     db_sess.commit()
     return search_results(author, name)
 
@@ -115,16 +118,65 @@ def search_form():
 @app.route('/results/', methods=['GET', 'POST'])
 def search_results(author, name):
     db_sess = db_session.create_session()
-    book = db_sess.query(Book).filter((Book.name == name),
-    (Book.author == author)).first()
-    print(book)
-    if not book:
+    books = db_sess.query(Book).filter((Book.name == name),
+                                       (Book.author == author)).all()
+    print(books)
+    if not books:
         books = db_sess.query(Book).all()
-        return render_template("results.html", title="Ничего не найдено. \n"
-                                                     "Ознакомьтесь с нашим каталогом", books=books,
+        return render_template("results.html", title1="Ничего не найдено",
+                               title2="Ознакомьтесь с нашим каталогом", books=books,
                                author=author, name=name)
-    return render_template("result.html", title="Результаты поиска", item=book,
-                           author=author, name=name)
+    if len(books) == 1:
+        return render_template("results.html", title1="Результаты поиска", item=books[0],
+                               author=author, name=name)
+    if len(books) > 1:
+        return render_template("results.html", title1="Результаты поиска", books=books,
+                               author=author, name=name)
+
+
+@app.route('/basket', methods=['POST', 'GET'])
+@login_required
+def basket():
+    user_current_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    purchases = db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).all()
+    checkout = {}
+    if purchases:
+        counter = 0
+        if len(purchases) > 1:
+            for el in purchases:
+                q = db_sess.query(Book).filter(el.book_id == Book.id).first()
+                checkout[q] = el.quantity
+                counter += q.price * el.quantity
+        else:
+            q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
+            checkout = {q: purchases[0].quantity}
+            counter = q.price * purchases[0].quantity
+        # print(checkout)
+        return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter)
+    return render_template("basket.html", title="Корзина")
+
+
+@app.route('/order', methods=['POST', 'GET'])
+@login_required
+def order():
+    user_current_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    purchases = db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).all()
+    if len(purchases) > 1:
+        for el in purchases:
+            q = db_sess.query(Book).filter(el.book_id == Book.id).first()
+            q.quantity -= el.quantity
+            if q.quantity == 0:
+                q.is_available = 0
+    else:
+        q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
+        q.quantity -= purchases[0].quantity
+        if q.quantity == 0:
+            q.is_available = 0
+    db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).delete()
+    db_sess.commit()
+    return render_template("base.html", title="Ваш заказ успешно оформлен")
 
 
 def main():
