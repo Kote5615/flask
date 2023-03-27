@@ -1,10 +1,11 @@
 from flask import Flask, render_template, redirect, request
 from data import db_session
 from data.users import User
-from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
+from data.books import Book
+from data.user_purchases import Purchase
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from forms.user import RegisterForm, LoginForm, SearchForm
 import calendar
-from forms.user import RegisterForm, LoginForm, SettingsForm
-
 UPLOAD_FOLDER = 'static/icons/'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -61,6 +62,7 @@ def login():
     if current_user.is_authenticated:
         return redirect('/')
     else:
+
         form = LoginForm()
         if form.validate_on_submit():
             db_sess = db_session.create_session()
@@ -93,6 +95,10 @@ def iconoutput():
 @app.route("/")
 @app.route("/profile")
 def profile():
+    # # form = SearchForm()
+    # # if form.validate_on_submit():
+    # #     return redirect('/search/<{}>/<{}>'.format(form.name.data, form.author.data))
+    # return render_template('profile.html')
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         reg_date = db_sess.query(User.reg_date).filter(User.id == current_user.get_id()).first()
@@ -163,6 +169,123 @@ def settings():
 
     else:
         return redirect("/login")
+
+
+@app.route('/add_to_basket/<index>/<author>/<name>', methods=['POST'])
+@login_required
+def add_to_basket(index, author, name):
+    db_sess = db_session.create_session()
+    book = db_sess.query(Book).get(index)
+    purchase = db_sess.query(Purchase).filter((Purchase.user_id == current_user.get_id()),
+                                              (Purchase.book_id == index)).first()
+    if purchase:
+        if book.quantity >= purchase.quantity + 1:
+            purchase.quantity = purchase.quantity + 1
+    else:
+        if book.quantity >= 1:
+            purchase = Purchase(
+                user_id=current_user.get_id(),
+                book_id=index,
+                quantity=1
+            )
+            db_sess.add(purchase)
+    db_sess.commit()
+    return search_results(author, name)
+
+
+@app.route('/change_quantity/<index>/<operation>', methods=['POST'])
+@login_required
+def change_quantity(index, operation):
+    db_sess = db_session.create_session()
+    book = db_sess.query(Book).get(index)
+    purchase = db_sess.query(Purchase).filter((Purchase.user_id == current_user.get_id()),
+                                              (Purchase.book_id == index)).first()
+    if operation == "-":
+        if purchase.quantity > 1:
+            purchase.quantity = purchase.quantity - 1
+        else:
+            db_sess.delete(purchase)
+    elif operation == "delete":
+        db_sess.delete(purchase)
+    else:
+        if book.quantity >= purchase.quantity + 1:
+            purchase.quantity = purchase.quantity + 1
+    db_sess.commit()
+    return redirect("/basket")
+
+
+@app.route("/search", methods=['GET', 'POST'])
+def search_form():
+    form = SearchForm()
+    if form.validate_on_submit():
+        print(form.name.data, form.author.data)
+        # return redirect('/results/<{}>/<{}>'.format(form.author.data, form.name.data))
+        return search_results(form.author.data, form.name.data)
+    return render_template('search.html', form=form)
+
+
+@app.route('/results/', methods=['GET', 'POST'])
+def search_results(author, name):
+    db_sess = db_session.create_session()
+    books = db_sess.query(Book).filter((Book.name == name),
+                                       (Book.author == author)).all()
+    print(books)
+    if not books:
+        books = db_sess.query(Book).all()
+        return render_template("results.html", title1="Ничего не найдено",
+                               title2="Ознакомьтесь с нашим каталогом", books=books,
+                               author=author, name=name)
+    if len(books) == 1:
+        return render_template("results.html", title1="Результаты поиска", item=books[0],
+                               author=author, name=name)
+    if len(books) > 1:
+        return render_template("results.html", title1="Результаты поиска", books=books,
+                               author=author, name=name)
+
+
+@app.route('/basket', methods=['POST', 'GET'])
+@login_required
+def basket():
+    user_current_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    purchases = db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).all()
+    checkout = {}
+    if purchases:
+        counter = 0
+        if len(purchases) > 1:
+            for el in purchases:
+                q = db_sess.query(Book).filter(el.book_id == Book.id).first()
+                checkout[q] = el.quantity
+                counter += q.price * el.quantity
+        else:
+            q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
+            checkout = {q: purchases[0].quantity}
+            counter = q.price * purchases[0].quantity
+        # print(checkout)
+        return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter)
+    return render_template("basket.html", title="Корзина")
+
+
+@app.route('/order', methods=['POST', 'GET'])
+@login_required
+def order():
+    user_current_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    purchases = db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).all()
+    if len(purchases) > 1:
+        for el in purchases:
+            q = db_sess.query(Book).filter(el.book_id == Book.id).first()
+            q.quantity -= el.quantity
+            if q.quantity == 0:
+                q.is_available = 0
+    else:
+        q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
+        q.quantity -= purchases[0].quantity
+        if q.quantity == 0:
+            q.is_available = 0
+    db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).delete()
+    db_sess.commit()
+    return render_template("base.html", title="Ваш заказ успешно оформлен")
 
 
 def main():

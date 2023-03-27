@@ -1,12 +1,12 @@
-import datetime
 import sqlalchemy
+from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 from sqlalchemy import orm
 from flask_login import LoginManager, UserMixin, login_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-class User(SqlAlchemyBase, UserMixin):  # надо обозначить что это класс модели
+class User(SqlAlchemyBase, UserMixin, SerializerMixin):  # надо обозначить что это класс модели
     __tablename__ = 'users'  # таблица, которая будет создана для хранения данных этой модели
     # jobs = orm.relationship("Jobs", back_populates='user')
 

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 align="center">
+    <br>
+  {{title}}<br>
+    <br>
+</h2>
+{% if checkout %}
+<div class="container">
+  <div class="row row-cols-6 gy-10">
+    <div class="col">
+        <div class="p-3 border bg-light">Название</div>
+    </div>
+      <div class="col">
+     <div class="p-3 border bg-light">Автор</div>
+    </div>
+      <div class="col">
+     <div class="p-3 border bg-light">Жанр</div>
+    </div>
+    <div class="col">
+     <div class="p-3 border bg-light">Количество</div>
+    </div>
+      <div class="col">
+       <div class="p-3 border bg-light">Цена</div>
+    </div>
+    <div class="col">
+        <div class="p-3 border bg-light">Стоимость</div>
+    </div>
+   </div>
+  </div>
+<div class="container">
+{% for key, val in checkout.items() %}
+  <div class="row row-cols-6 gy-10">
+    <div class="col">
+     <div class="p-3 border bg-light">{{key.name}}</div>
+    </div>
+      <div class="col">
+          <div class="p-3 border bg-light">{{key.author}}</div>
+    </div>
+      <div class="col">
+      <div class="p-3 border bg-light">{{key.genre}}</div>
+    </div>
+    <div class="col">
+        <br>
+        <div class="btn-group" role="group" aria-label="Basic example">
+        <form action="/change_quantity/{{key.id}}/+" method="POST">
+            <input type="submit" class="btn btn-outline-primary" value="+">
+        </form>
+            <button type="button" class="btn btn-light">{{val}}</button>
+        <form action="/change_quantity/{{key.id}}/-" method="POST">
+            <input type="submit" class="btn btn-outline-primary" value="-">
+        </form>
+        <form action="/change_quantity/{{key.id}}/delete" method="POST">
+            <input type="submit" class="btn btn-outline-danger" value="Delete"
+                   data-bs-toggle="tooltip" data-bs-placement="top" title="Удалить из корзины">
+        </form>
+
+            </div>
+    </div>
+      <div class="col">
+          <div class="p-3 border bg-light">{{key.price}}</div>
+    </div>
+      <div class="col">
+          <div class="p-3 border bg-light">{{key.price * val}}</div>
+    </div>
+   </div>
+{% endfor %}
+    <br>
+    <br>
+<div class="col">
+    <div class="p-3 border bg-light">Итого: {{counter}}</div>
+</div>
+    <br>
+    <br>
+</div>
+<div class="status">
+    <form action="/order" method="POST">
+        <input type="submit" class="btn btn-outline-primary" value="Оформить заказ">
+    </form>
+</div>
+
+{% else %}
+<h2 align="center">
+  Корзина пуста
+</h2>
+{% endif %}
+
+{% endblock %}

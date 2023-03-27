@@ -19,6 +19,12 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
+
+class SearchForm(FlaskForm):
+    name = TextAreaField('Название', validators=[DataRequired()])
+    author = TextAreaField('Автор', validators=[DataRequired()])
+    submit = SubmitField('Поиск')
+
 class SettingsForm(FlaskForm):
     name = StringField('Имя пользователя', validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
