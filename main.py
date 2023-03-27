@@ -105,6 +105,27 @@ def add_to_basket(index, author, name):
     return search_results(author, name)
 
 
+@app.route('/change_quantity/<index>/<operation>', methods=['POST'])
+@login_required
+def change_quantity(index, operation):
+    db_sess = db_session.create_session()
+    book = db_sess.query(Book).get(index)
+    purchase = db_sess.query(Purchase).filter((Purchase.user_id == current_user.get_id()),
+                                              (Purchase.book_id == index)).first()
+    if operation == "-":
+        if purchase.quantity > 1:
+            purchase.quantity = purchase.quantity - 1
+        else:
+            db_sess.delete(purchase)
+    elif operation == "delete":
+        db_sess.delete(purchase)
+    else:
+        if book.quantity >= purchase.quantity + 1:
+            purchase.quantity = purchase.quantity + 1
+    db_sess.commit()
+    return redirect("/basket")
+
+
 @app.route("/search", methods=['GET', 'POST'])
 def search_form():
     form = SearchForm()
