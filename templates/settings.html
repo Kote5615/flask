@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<article class="rounding wrapper shadow">
+    <section class="otstuptop otstupbottompadding">
+        <div class="otstup">
+
+            <h5 class="fs-5">Загрузите аватарку</h5>
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="photo">Выберите файл</label>
+                    <input type="file" class="form-control-file" id="photo" name="file">
+                </div>
+
+                <form class="login_form " method="post">
+                    <div class="form-group">
+                        <label for="about"  style="margin-top: 3%;" class="fs-5">Расскажите неменого о себе</label>
+                        <textarea class="form-control" id="about" rows="3" name="about"></textarea>
+                    </div>
+                    <button style="margin-top: 3%;" type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </form>
+
+
+
+        </div>
+    </section>
+</article>
+</form>
+
+
+{% endblock %}
