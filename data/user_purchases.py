@@ -10,3 +10,4 @@ class Purchase(SqlAlchemyBase, UserMixin, SerializerMixin):
                            primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     book_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    quantity = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)

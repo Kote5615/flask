@@ -13,3 +13,5 @@ class Book(SqlAlchemyBase, UserMixin, SerializerMixin):
     price = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     quantity = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     is_available = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)
+    author = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
