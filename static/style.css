@@ -1,5 +1,4 @@
 body {
-    text-align: center;
     /* background-image:url(https://salon.ru/storage/thumbs/gallery/183/182152/835_3500_s361.jpg); */
     /* background-image:url(img/OF18H00.jpg); */
     background-color: #eef3fb;
@@ -54,9 +53,7 @@ body {
     padding-bottom: 30px;
 }
 
-.text-centre {
-    text-align: center;
-}
+
 
 .red{
     color: red;
