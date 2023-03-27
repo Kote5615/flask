@@ -4,6 +4,7 @@ from .db_session import SqlAlchemyBase
 from sqlalchemy import orm
 from flask_login import LoginManager, UserMixin, login_user
 from werkzeug.security import check_password_hash, generate_password_hash
+import datetime
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):  # надо обозначить что это класс модели
