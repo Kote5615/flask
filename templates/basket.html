@@ -42,7 +42,21 @@
       <div class="p-3 border bg-light">{{key.genre}}</div>
     </div>
     <div class="col">
-        <div class="p-3 border bg-light">{{val}}</div>
+        <br>
+        <div class="btn-group" role="group" aria-label="Basic example">
+        <form action="/change_quantity/{{key.id}}/+" method="POST">
+            <input type="submit" class="btn btn-outline-primary" value="+">
+        </form>
+            <button type="button" class="btn btn-light">{{val}}</button>
+        <form action="/change_quantity/{{key.id}}/-" method="POST">
+            <input type="submit" class="btn btn-outline-primary" value="-">
+        </form>
+        <form action="/change_quantity/{{key.id}}/delete" method="POST">
+            <input type="submit" class="btn btn-outline-danger" value="Delete"
+                   data-bs-toggle="tooltip" data-bs-placement="top" title="Удалить из корзины">
+        </form>
+
+            </div>
     </div>
       <div class="col">
           <div class="p-3 border bg-light">{{key.price}}</div>
@@ -60,13 +74,6 @@
     <br>
     <br>
 </div>
-<div class="status">
-    <form action="/basket" method="POST">
-        <input type="submit" class="btn btn-outline-primary" value="Пересчитать стоимость">
-    </form>
-</div>
-<br>
-<br>
 <div class="status">
     <form action="/order" method="POST">
         <input type="submit" class="btn btn-outline-primary" value="Оформить заказ">
