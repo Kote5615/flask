@@ -1,12 +1,8 @@
-import os
-
 from flask import Flask, render_template, redirect, request
 from data import db_session
 from data.users import User
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
-from data.db_session import SqlAlchemyBase
 import calendar
-from werkzeug.utils import secure_filename
 from forms.user import RegisterForm, LoginForm, SettingsForm
 
 UPLOAD_FOLDER = 'static/icons/'
