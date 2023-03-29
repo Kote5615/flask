@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<article class="rounding wrapper shadow" style="margin-top: 2%;">
+    <section class="otstuptop otstupbottompadding">
+        <div class="otstup ">
+            <h4>Книги в жанре {{ genre }}</h4>
+            <div style="color: #9197a3;">Найдено {{ amount }} книг</div>
+            <hr class="bg-danger border-top border-dark">
+            {% for item in books %}
+            <div class="otstupbottom">
+                <img class="shadow cover-search" src="/static/img/4824032.jpg" alt="">
+                <div class="item-info">
+                    <a href="/item" class="fs-4">{{ item }}</a>
+                    <p class="fs-5" style="color: #9197a3;">{{ author }}</p>
+                    <p class="fs-7">{{ genre }}</p>
+                    <p class="fs-7">{{ about }}</p>
+                    <p style="color: #656565;">
+
+                </div>
+                <hr class="bg-danger border-top border-dark">
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </section>
+</article>
+{% endblock %}
