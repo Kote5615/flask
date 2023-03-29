@@ -227,3 +227,9 @@ body {
 	border-left: 13px solid #32be5b;
 	transform: scaleX(.65);
 }
+
+.cover-search{
+    width: 30%;
+    border: 2px solid #cecece;
+    border-radius: 2px 8px 8px 2px;
+}

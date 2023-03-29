@@ -130,13 +130,25 @@ def profile():
         return redirect("/login")
 
 
-@app.route("/")
+
 @app.route("/book")
 @app.route("/item")
 def item():
     return render_template('item.html', item='Name', author='Author', genres='genre1, genre2, genre3...',
                            str_number='500',
                            about_book='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. ')
+
+books = ['book1', 'book2']
+@app.route("/")
+@app.route("/sort/genres")
+def genres():
+    # books = db_session.query(Book).all()
+    return render_template('genres.html', genre='Жанр', amount='amount', books=books, author='Пушкин', item='Евгений Онегин')
+
+
+
+
+
 
 
 @app.route("/settings", methods=['POST', 'GET'])
