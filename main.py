@@ -6,6 +6,7 @@ from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm
 import calendar
+
 UPLOAD_FOLDER = 'static/icons/'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -92,7 +93,6 @@ def iconoutput():
         return str(icon)[2:-3]
 
 
-@app.route("/")
 @app.route("/profile")
 def profile():
     # # form = SearchForm()
@@ -130,6 +130,15 @@ def profile():
         return redirect("/login")
 
 
+@app.route("/")
+@app.route("/book")
+@app.route("/item")
+def item():
+    return render_template('item.html', item='Name', author='Author', genres='genre1, genre2, genre3...',
+                           str_number='500',
+                           about_book='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. ')
+
+
 @app.route("/settings", methods=['POST', 'GET'])
 @app.route("/modify", methods=['POST', 'GET'])
 def settings():
@@ -140,7 +149,7 @@ def settings():
         email = db_sess.query(User.email).filter(User.id == current_user.get_id()).first()
         user = current_user
 
-        print(user.id)
+        # print(user.id)
 
         if request.method == 'POST':
             f = request.files['file']
@@ -229,7 +238,7 @@ def search_results(author, name):
     db_sess = db_session.create_session()
     books = db_sess.query(Book).filter((Book.name == name),
                                        (Book.author == author)).all()
-    print(books)
+    # print(books)
     if not books:
         books = db_sess.query(Book).all()
         return render_template("results.html", title1="Ничего не найдено",

@@ -1,98 +1,98 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 align="center">
+<h2>
   {{title1}}<br>
   <small class="text-muted">{{title2}}</small>
 </h2>
 <div class="container">
   <div class="row row-cols-6 gy-10">
     <div class="col">
-        <div class="p-3 border bg-light">Название</div>
-    </div>
-      <div class="col">
-     <div class="p-3 border bg-light">Автор</div>
-    </div>
-      <div class="col">
-     <div class="p-3 border bg-light">Жанр</div>
+      <div class="p-3 border bg-light">Название</div>
     </div>
     <div class="col">
-     <div class="p-3 border bg-light">Количество</div>
-    </div>
-      <div class="col">
-       <div class="p-3 border bg-light">Цена</div>
+      <div class="p-3 border bg-light">Автор</div>
     </div>
     <div class="col">
-        <div class="p-3 border bg-light">Купить</div>
+      <div class="p-3 border bg-light">Жанр</div>
     </div>
-   </div>
+    <div class="col">
+      <div class="p-3 border bg-light">Количество</div>
+    </div>
+    <div class="col">
+      <div class="p-3 border bg-light">Цена</div>
+    </div>
+    <div class="col">
+      <div class="p-3 border bg-light">Купить</div>
+    </div>
   </div>
+</div>
 {% if books %}
 <div class="container">
-{% for item in books%}
+  {% for item in books%}
   <div class="row row-cols-6 gy-10">
     <div class="col">
-     <div class="p-3 border bg-light">{{item.name}}</div>
+      <div class="p-3 border bg-light">{{item.name}}</div>
     </div>
-      <div class="col">
-          <div class="p-3 border bg-light">{{item.author}}</div>
+    <div class="col">
+      <div class="p-3 border bg-light">{{item.author}}</div>
     </div>
-      <div class="col">
+    <div class="col">
       <div class="p-3 border bg-light">{{item.genre}}</div>
     </div>
     <div class="col">
-        <div class="p-3 border bg-light">{{item.quantity}}</div>
-    </div>
-      <div class="col">
-          <div class="p-3 border bg-light">{{item.price}}</div>
+      <div class="p-3 border bg-light">{{item.quantity}}</div>
     </div>
     <div class="col">
-     <div>
-        {% if item.is_available %}
-         <div class="status">
-            <form action="/add_to_basket/{{item.id}}/{{author}}/{{name}}" method="POST">
-                <input type="submit" class="btn btn-outline-success" value="Добавить в корзину">
-            </form>
-        </div>
-         {% else %}
-       <div class="p-3 border bg-light">Нет в наличии</div>
-          {% endif %}
+      <div class="p-3 border bg-light">{{item.price}}</div>
     </div>
-   </div>
+    <div class="col">
+      <div>
+        {% if item.is_available %}
+        <div class="status">
+          <form action="/add_to_basket/{{item.id}}/{{author}}/{{name}}" method="POST">
+            <input type="submit" class="btn btn-outline-success" value="Добавить в корзину">
+          </form>
+        </div>
+        {% else %}
+        <div class="p-3 border bg-light">Нет в наличии</div>
+        {% endif %}
+      </div>
+    </div>
   </div>
-{% endfor %}
+  {% endfor %}
 </div>
 {% else %}
 <div class="container">
   <div class="row row-cols-6 gy-10">
     <div class="col">
-     <div class="p-3 border bg-light">{{item.name}}</div>
+      <div class="p-3 border bg-light">{{item.name}}</div>
     </div>
-      <div class="col">
-          <div class="p-3 border bg-light">{{item.author}}</div>
+    <div class="col">
+      <div class="p-3 border bg-light">{{item.author}}</div>
     </div>
-      <div class="col">
+    <div class="col">
       <div class="p-3 border bg-light">{{item.genre}}</div>
     </div>
     <div class="col">
-        <div class="p-3 border bg-light">{{item.quantity}}</div>
-    </div>
-      <div class="col">
-          <div class="p-3 border bg-light">{{item.price}}</div>
+      <div class="p-3 border bg-light">{{item.quantity}}</div>
     </div>
     <div class="col">
-     <div>
-        {% if item.is_available %}
-         <div class="status">
-            <form action="/add_to_basket/{{item.id}}/{{author}}/{{name}}" method="POST">
-                <input type="submit" class="btn btn-outline-success" value="Добавить в корзину">
-            </form>
-        </div>
-         {% else %}
-       <div class="p-3 border bg-light">Нет в наличии</div>
-          {% endif %}
+      <div class="p-3 border bg-light">{{item.price}}</div>
     </div>
-   </div>
+    <div class="col">
+      <div>
+        {% if item.is_available %}
+        <div class="status">
+          <form action="/add_to_basket/{{item.id}}/{{author}}/{{name}}" method="POST">
+            <input type="submit" class="btn btn-outline-success" value="Добавить в корзину">
+          </form>
+        </div>
+        {% else %}
+        <div class="p-3 border bg-light">Нет в наличии</div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </div>
 {% endif %}
