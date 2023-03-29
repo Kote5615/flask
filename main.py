@@ -130,7 +130,6 @@ def profile():
         return redirect("/login")
 
 
-@app.route("/")
 @app.route("/book")
 @app.route("/item")
 def item():
@@ -180,9 +179,9 @@ def settings():
         return redirect("/login")
 
 
-@app.route('/add_to_basket/<index>/<author>/<name>', methods=['POST'])
+@app.route('/add_to_basket/<index>/<author>/<name>/<status>', methods=['POST'])
 @login_required
-def add_to_basket(index, author, name):
+def add_to_basket(index, author, name, status):
     db_sess = db_session.create_session()
     book = db_sess.query(Book).get(index)
     purchase = db_sess.query(Purchase).filter((Purchase.user_id == current_user.get_id()),
@@ -199,7 +198,10 @@ def add_to_basket(index, author, name):
             )
             db_sess.add(purchase)
     db_sess.commit()
-    return search_results(author, name)
+    if status == "from_search":
+        return search_results(author, name)
+    else:
+        return sort_by_genre(status)
 
 
 @app.route('/change_quantity/<index>/<operation>', methods=['POST'])
@@ -235,10 +237,14 @@ def search_form():
 
 @app.route('/results/', methods=['GET', 'POST'])
 def search_results(author, name):
+    author = author.lower()
+    name = name.lower()
     db_sess = db_session.create_session()
-    books = db_sess.query(Book).filter((Book.name == name),
-                                       (Book.author == author)).all()
-    # print(books)
+    # books = db_sess.query(Book).filter((Book.name == name),
+    #                                    (Book.author == author)).all()
+    books = db_sess.query(Book).filter((Book.name.like("%{}%".format(name))) |
+                                       (Book.author.like("%{}%".format(author)))).all()
+    print(books)
     if not books:
         books = db_sess.query(Book).all()
         return render_template("results.html", title1="Ничего не найдено",
@@ -295,6 +301,22 @@ def order():
     db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).delete()
     db_sess.commit()
     return render_template("base.html", title="Ваш заказ успешно оформлен")
+
+
+@app.route("/")
+def home_page():
+    return render_template("home.html", title="Главная страница")
+
+
+@app.route("/books/<category>", methods=['POST', 'GET'])
+def sort_by_genre(category):
+    db_sess = db_session.create_session()
+    if category == "all":
+        books = db_sess.query(Book).all()
+        return render_template("results.html", title1="Каталог", books=books, genre=category)
+    books = db_sess.query(Book).filter(Book.category == category).all()
+    return render_template("results.html", title1="Книги жанра «{}»".format(category.capitalize()),
+                           books=books, genre=category)
 
 
 def main():
