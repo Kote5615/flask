@@ -25,9 +25,21 @@ class SearchForm(FlaskForm):
     author = TextAreaField('Автор', validators=[DataRequired()])
     submit = SubmitField('Поиск')
 
+
 class SettingsForm(FlaskForm):
     name = StringField('Имя пользователя', validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
     submit = SubmitField('Сохранить изменения')
 
 
+class BookForm(FlaskForm):
+    name = StringField('Название книги', validators=[DataRequired()])
+    name_for_search = StringField('Название для поиска', validators=[DataRequired()])
+    author = StringField('Автор', validators=[DataRequired()])
+    author_for_search = StringField('Автор для поиска', validators=[DataRequired()])
+    price = StringField('Цена', validators=[DataRequired()])
+    quantity = StringField('Количество', validators=[DataRequired()])
+    genre = StringField('Жанр', validators=[DataRequired()])
+    category = StringField('Категория', validators=[DataRequired()])
+    is_available = BooleanField('Есть в наличии', validators=[DataRequired()])
+    submit = SubmitField('Добавить книгу в каталог')
