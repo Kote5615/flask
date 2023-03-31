@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{Title}}</h2>
+<br>
+<br>
+<div class="container border border-primary border border-2 rounded">
+    <br>
+    <div class="row">
+        <div class="col">
+            <form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }}<br>
+    {{ form.name(class="form-control", type="text") }}<br>
+    {{ form.name_for_search.label }}<br>
+    {{ form.name_for_search(class="form-control", type="text") }}<br>
+    {{ form.author.label }}<br>
+    {{ form.author(class="form-control", type="text") }}<br>
+    {{ form.author_for_search.label }}<br>
+    {{ form.author_for_search(class="form-control", type="text") }}<br>
+    {{ form.price.label }}<br>
+    {{ form.price(class="form-control", type="text") }}<br>
+    {{ form.quantity.label }}<br>
+    {{ form.quantity(class="form-control", type="text") }}<br>
+    {{ form.genre.label }}<br>
+    {{ form.genre(class="form-control", type="text") }}<br>
+    {{ form.category.label }}<br>
+    {{ form.category(class="form-control", type="text") }}<br>
+    {{ form.is_available.label }}<br>
+    {{ form.is_available(class="form-control", type="text") }}<br>
+    <div align="center">{{ form.submit(type="submit", class="btn btn-outline-primary") }}</div>
+                <br>
+                </form>
+    </div>
+        </div>
+
+</div>
+
+{% endblock %}
