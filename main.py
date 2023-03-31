@@ -4,7 +4,7 @@ from data.users import User
 from data.books import Book
 from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
-from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm
+from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm
 import calendar
 
 UPLOAD_FOLDER = 'static/icons/'
@@ -229,22 +229,17 @@ def change_quantity(index, operation):
 def search_form():
     form = SearchForm()
     if form.validate_on_submit():
-        print(form.name.data, form.author.data)
-        # return redirect('/results/<{}>/<{}>'.format(form.author.data, form.name.data))
-        return search_results(form.author.data, form.name.data)
+        name = "".join(form.name.data.lower().split())
+        author = "".join(form.author.data.lower().split())
+        return search_results(author, name)
     return render_template('search.html', form=form)
 
 
-@app.route('/results/', methods=['GET', 'POST'])
+@app.route('/results', methods=['GET', 'POST'])
 def search_results(author, name):
-    author = author.lower()
-    name = name.lower()
     db_sess = db_session.create_session()
-    # books = db_sess.query(Book).filter((Book.name == name),
-    #                                    (Book.author == author)).all()
-    books = db_sess.query(Book).filter((Book.name.like("%{}%".format(name))) |
-                                       (Book.author.like("%{}%".format(author)))).all()
-    print(books)
+    books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(name))) |
+                                       (Book.author_for_search.like("%{}%".format(author)))).all()
     if not books:
         books = db_sess.query(Book).all()
         return render_template("results.html", title1="Ничего не найдено",
@@ -276,7 +271,6 @@ def basket():
             q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
             checkout = {q: purchases[0].quantity}
             counter = q.price * purchases[0].quantity
-        # print(checkout)
         return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter)
     return render_template("basket.html", title="Корзина")
 
@@ -317,6 +311,85 @@ def sort_by_genre(category):
     books = db_sess.query(Book).filter(Book.category == category).all()
     return render_template("results.html", title1="Книги жанра «{}»".format(category.capitalize()),
                            books=books, genre=category)
+
+
+@app.route("/admin", methods=['POST', 'GET'])
+@login_required
+def add_edit_delete_books():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        books = db_sess.query(Book).all()
+        return render_template("admin_rights.html", books=books, title="Изменение каталога")
+    return redirect("/")
+
+
+@app.route("/add_form", methods=['POST', 'GET'])
+@login_required
+def add_books_form():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = BookForm()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            book = Book()
+            book.name = form.name.data
+            book.price = form.price.data
+            book.quantity = form.quantity.data
+            book.is_available = form.is_available.data
+            book.author = form.author.data
+            book.genre = form.genre.data
+            book.category = form.category.data
+            db_sess.add(book)
+            db_sess.commit()
+            return redirect('/')
+        return render_template('add_book_form.html',
+                               form=form, title="Добавление книги")
+    return redirect('/')
+
+
+@app.route("/delete/<int:book_id>", methods=['POST', 'GET'])
+@login_required
+def delete_book(book_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        book = db_sess.query(Book).filter(Book.id == book_id).first()
+        db_sess.delete(book)
+        purchases = db_sess.query(Purchase).filter(Purchase.book_id == book_id).all()
+        for i in purchases:
+            db_sess.delete(i)
+        db_sess.commit()
+    return redirect('/')
+
+
+@app.route("/edit/<int:book_id>", methods=['POST', 'GET'])
+@login_required
+def edit_books_form(book_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = BookForm()
+        db_sess = db_session.create_session()
+        book = db_sess.query(Book).filter(Book.id == book_id).first()
+        if form.validate_on_submit():
+            book.name = form.name.data
+            book.price = form.price.data
+            book.quantity = form.quantity.data
+            book.is_available = form.is_available.data
+            book.author = form.author.data
+            book.genre = form.genre.data
+            book.category = form.category.data
+            db_sess.commit()
+            return redirect('/')
+        return render_template('edit_book_form.html',
+                               form=form, title="Редактирование книги", book=book)
+    return redirect('/')
 
 
 def main():
