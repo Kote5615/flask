@@ -10,9 +10,11 @@ class Book(SqlAlchemyBase, UserMixin, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    name_for_search = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    author = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    author_for_search = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     price = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     quantity = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    is_available = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)
-    author = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    is_available = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)
