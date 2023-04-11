@@ -6,6 +6,7 @@ from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm
 import calendar
+from translator import translate
 
 UPLOAD_FOLDER = 'static/icons/'
 app = Flask(__name__)
@@ -238,8 +239,14 @@ def search_form():
 @app.route('/results', methods=['GET', 'POST'])
 def search_results(author, name):
     db_sess = db_session.create_session()
+    
     books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(name))) |
                                        (Book.author_for_search.like("%{}%".format(author)))).all()
+    if not books:
+        new_author = "".join([translate[i]if i in translate.keys() else i for i in author])
+        new_name = "".join([translate[i]if i in translate.keys() else i for i in name])
+        books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(new_name))) |
+                                           (Book.author_for_search.like("%{}%".format(new_author)))).all()
     if not books:
         books = db_sess.query(Book).all()
         return render_template("results.html", title1="Ничего не найдено",
@@ -260,6 +267,8 @@ def basket():
     db_sess = db_session.create_session()
     purchases = db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).all()
     checkout = {}
+    address = db_sess.query(User).filter(User.id == user_current_id).first().about
+
     if purchases:
         counter = 0
         if len(purchases) > 1:
@@ -271,8 +280,9 @@ def basket():
             q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
             checkout = {q: purchases[0].quantity}
             counter = q.price * purchases[0].quantity
-        return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter)
-    return render_template("basket.html", title="Корзина")
+        return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter,
+                               address=address)
+    return render_template("basket.html", title="Корзина", address=address)
 
 
 @app.route('/order', methods=['POST', 'GET'])
@@ -313,6 +323,15 @@ def sort_by_genre(category):
                            books=books, genre=category)
 
 
+@app.route("/author/<author>", methods=['POST', 'GET'])
+def sort_by_author(author):
+    db_sess = db_session.create_session()
+    books = db_sess.query(Book).filter(Book.author_for_search == author).all()
+    full_name = db_sess.query(Book).filter(Book.author_for_search == author).first().author
+    return render_template("results.html", title1="Книги автора «{}»".format(full_name),
+                           books=books)
+
+
 @app.route("/admin", methods=['POST', 'GET'])
 @login_required
 def add_edit_delete_books():
@@ -345,7 +364,7 @@ def add_books_form():
             book.category = form.category.data
             db_sess.add(book)
             db_sess.commit()
-            return redirect('/')
+            return redirect('/admin')
         return render_template('add_book_form.html',
                                form=form, title="Добавление книги")
     return redirect('/')
@@ -386,10 +405,21 @@ def edit_books_form(book_id):
             book.genre = form.genre.data
             book.category = form.category.data
             db_sess.commit()
-            return redirect('/')
+            return redirect('/edit/{}'.format(book_id))
         return render_template('edit_book_form.html',
                                form=form, title="Редактирование книги", book=book)
     return redirect('/')
+
+
+@app.route("/not_found")
+def not_found():
+    return render_template('not_found.html')
+
+
+@app.errorhandler(Exception)
+def error(e):
+    return redirect('/not_found')
+    # return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 def main():

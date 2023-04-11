@@ -72,6 +72,11 @@
     <div class="p-3 border bg-light">Итого: {{counter}}</div>
 </div>
     <br>
+{% if address %}
+<div class="col">
+    <div class="p-3 border bg-light">Адрес доставки: {{address}}</div>
+</div>
+    <br>
     <br>
 </div>
 <div class="status" align="center">
@@ -79,6 +84,20 @@
         <input type="submit" class="btn btn-outline-primary" value="Оформить заказ">
     </form>
 </div>
+{% else %}
+<div class="col">
+    <div class="p-3 border bg-light">Адрес доставки: Не указан</div>
+</div>
+    <br>
+    <br>
+<div class="status" align="center">
+    <form action="/profile">
+        <input type="submit" class="btn btn-outline-primary" value="Добавить адрес">
+    </form>
+</div>
+<br>
+<br>
+{% endif %}
 
 {% else %}
 <h2 align="center">
