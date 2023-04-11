@@ -48,7 +48,7 @@
     </div>
     <div class="col">
      <div>
-        {% if item.is_available %}
+        {% if item.quantity > 0 %}
          {% if author %}
          <div class="status">
             <form action="/add_to_basket/{{item.id}}/{{author}}/{{name}}/from_search" method="POST">
@@ -90,7 +90,7 @@
     </div>
     <div class="col">
      <div>
-        {% if item.is_available %}
+        {% if item.quantity > 0 %}
          {% if author %}
          <div class="status">
             <form action="/add_to_basket/{{item.id}}/{{author}}/{{name}}/from_search" method="POST">

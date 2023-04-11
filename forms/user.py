@@ -41,5 +41,4 @@ class BookForm(FlaskForm):
     quantity = StringField('Количество', validators=[DataRequired()])
     genre = StringField('Жанр', validators=[DataRequired()])
     category = StringField('Категория', validators=[DataRequired()])
-    is_available = BooleanField('Есть в наличии', validators=[DataRequired()])
     submit = SubmitField('Добавить книгу в каталог')

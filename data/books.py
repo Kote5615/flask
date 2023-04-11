@@ -17,4 +17,3 @@ class Book(SqlAlchemyBase, UserMixin, SerializerMixin):
     quantity = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    is_available = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)

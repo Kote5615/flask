@@ -295,13 +295,9 @@ def order():
         for el in purchases:
             q = db_sess.query(Book).filter(el.book_id == Book.id).first()
             q.quantity -= el.quantity
-            if q.quantity == 0:
-                q.is_available = 0
     else:
         q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
         q.quantity -= purchases[0].quantity
-        if q.quantity == 0:
-            q.is_available = 0
     db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).delete()
     db_sess.commit()
     return render_template("base.html", title="Ваш заказ успешно оформлен")
@@ -358,7 +354,6 @@ def add_books_form():
             book.name = form.name.data
             book.price = form.price.data
             book.quantity = form.quantity.data
-            book.is_available = form.is_available.data
             book.author = form.author.data
             book.genre = form.genre.data
             book.category = form.category.data
@@ -383,6 +378,7 @@ def delete_book(book_id):
         for i in purchases:
             db_sess.delete(i)
         db_sess.commit()
+        return redirect('/admin')
     return redirect('/')
 
 
@@ -400,12 +396,11 @@ def edit_books_form(book_id):
             book.name = form.name.data
             book.price = form.price.data
             book.quantity = form.quantity.data
-            book.is_available = form.is_available.data
             book.author = form.author.data
             book.genre = form.genre.data
             book.category = form.category.data
             db_sess.commit()
-            return redirect('/edit/{}'.format(book_id))
+            return redirect('/admin')
         return render_template('edit_book_form.html',
                                form=form, title="Редактирование книги", book=book)
     return redirect('/')
