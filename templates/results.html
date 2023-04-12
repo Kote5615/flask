@@ -32,7 +32,11 @@
 {% for item in books%}
   <div class="row row-cols-6 gy-10">
     <div class="col">
-     <div class="p-3 border bg-light">{{item.name}}</div>
+     <div class="p-3 border bg-light">
+         <div>
+            <p><a class="link-opacity-10" href="/item/{{item.id}}">{{item.name}}</a></p>
+        </div>
+     </div>
     </div>
       <div class="col">
           <div class="p-3 border bg-light">{{item.author}}</div>
@@ -74,7 +78,9 @@
 <div class="container">
   <div class="row row-cols-6 gy-10">
     <div class="col">
-     <div class="p-3 border bg-light">{{item.name}}</div>
+        <div>
+            <p><a class="link-opacity-10" href="/item/{{item.id}}">{{item.name}}</a></p>
+        </div>
     </div>
       <div class="col">
           <div class="p-3 border bg-light">{{item.author}}</div>

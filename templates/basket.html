@@ -33,7 +33,9 @@
 {% for key, val in checkout.items() %}
   <div class="row row-cols-6 gy-10">
     <div class="col">
-     <div class="p-3 border bg-light">{{key.name}}</div>
+        <div class="p-3 border bg-light">
+            <p><a class="link-opacity-10" href="/item/{{key.id}}">{{key.name}}</a></p>
+        </div>
     </div>
       <div class="col">
           <div class="p-3 border bg-light">{{key.author}}</div>

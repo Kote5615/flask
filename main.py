@@ -4,7 +4,7 @@ from data.users import User
 from data.books import Book
 from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
-from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm
+from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm, AdminForm
 import calendar
 from translator import translate
 
@@ -131,12 +131,17 @@ def profile():
         return redirect("/login")
 
 
-@app.route("/book")
-@app.route("/item")
-def item():
-    return render_template('item.html', item='Name', author='Author', genres='genre1, genre2, genre3...',
-                           str_number='500',
-                           about_book='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. ')
+@app.route("/item/<index>")
+def item(index):
+    db_sess = db_session.create_session()
+    book = db_sess.query(Book).get(index)
+    return render_template('item.html', book=book,
+                           about_book='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo '
+                                      'ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis '
+                                      'parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, '
+                                      'pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec '
+                                      'pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, '
+                                      'rhoncus ut, imperdiet a, venenatis vitae, justo. ')
 
 
 @app.route("/settings", methods=['POST', 'GET'])
@@ -239,6 +244,7 @@ def search_form():
 @app.route('/results', methods=['GET', 'POST'])
 def search_results(author, name):
     db_sess = db_session.create_session()
+    print(author, name)
     
     books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(name))) |
                                        (Book.author_for_search.like("%{}%".format(author)))).all()
@@ -403,6 +409,25 @@ def edit_books_form(book_id):
             return redirect('/admin')
         return render_template('edit_book_form.html',
                                form=form, title="Редактирование книги", book=book)
+    return redirect('/')
+
+
+@app.route("/add_admin", methods=['POST', 'GET'])
+@login_required
+def add_admin():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = AdminForm()
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == form.id.data).first()
+        if form.validate_on_submit():
+            user.is_admin = 1
+            db_sess.commit()
+            return redirect('/')
+        return render_template('add_admin.html',
+                               form=form, title="Добавление администратора")
     return redirect('/')
 
 

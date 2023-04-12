@@ -21,8 +21,8 @@ class LoginForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    name = TextAreaField('Название', validators=[DataRequired()])
-    author = TextAreaField('Автор', validators=[DataRequired()])
+    name = TextAreaField('Название', default="#")
+    author = TextAreaField('Автор', default="#")
     submit = SubmitField('Поиск')
 
 
@@ -42,3 +42,8 @@ class BookForm(FlaskForm):
     genre = StringField('Жанр', validators=[DataRequired()])
     category = StringField('Категория', validators=[DataRequired()])
     submit = SubmitField('Добавить книгу в каталог')
+
+
+class AdminForm(FlaskForm):
+    id = StringField('Id', validators=[DataRequired()])
+    submit = SubmitField('Добавить администратора')
