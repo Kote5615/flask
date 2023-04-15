@@ -52,5 +52,5 @@ class AdminForm(FlaskForm):
 class AdvertisementForm(FlaskForm):
     title = StringField('Заголовок', validators=[DataRequired()])
     description = StringField("Описание", validators=[DataRequired()])
-    enabled = BooleanField("Используется", validators=[DataRequired()])
+    enabled = BooleanField("Используется")
     submit = SubmitField('Сохранить изменения')
