@@ -45,5 +45,12 @@ class BookForm(FlaskForm):
 
 
 class AdminForm(FlaskForm):
-    id = StringField('Id', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('Добавить администратора')
+
+
+class AdvertisementForm(FlaskForm):
+    title = StringField('Заголовок', validators=[DataRequired()])
+    description = StringField("Описание", validators=[DataRequired()])
+    enabled = BooleanField("Используется", validators=[DataRequired()])
+    submit = SubmitField('Сохранить изменения')

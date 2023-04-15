@@ -1,10 +1,14 @@
+import random
+
 from flask import Flask, render_template, redirect, request
 from data import db_session
+from data.page import Advertisement
 from data.users import User
 from data.books import Book
 from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
-from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm, AdminForm
+from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm, AdminForm, \
+    AdvertisementForm
 import calendar
 from translator import translate
 
@@ -136,12 +140,7 @@ def item(index):
     db_sess = db_session.create_session()
     book = db_sess.query(Book).get(index)
     return render_template('item.html', book=book,
-                           about_book='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo '
-                                      'ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis '
-                                      'parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, '
-                                      'pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec '
-                                      'pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, '
-                                      'rhoncus ut, imperdiet a, venenatis vitae, justo. ')
+                           about_book='Добавить описание')
 
 
 @app.route("/settings", methods=['POST', 'GET'])
@@ -206,6 +205,8 @@ def add_to_basket(index, author, name, status):
     db_sess.commit()
     if status == "from_search":
         return search_results(author, name)
+    elif status == "item":
+        return item(index)
     else:
         return sort_by_genre(status)
 
@@ -245,12 +246,12 @@ def search_form():
 def search_results(author, name):
     db_sess = db_session.create_session()
     print(author, name)
-    
+
     books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(name))) |
                                        (Book.author_for_search.like("%{}%".format(author)))).all()
     if not books:
-        new_author = "".join([translate[i]if i in translate.keys() else i for i in author])
-        new_name = "".join([translate[i]if i in translate.keys() else i for i in name])
+        new_author = "".join([translate[i] if i in translate.keys() else i for i in author])
+        new_name = "".join([translate[i] if i in translate.keys() else i for i in name])
         books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(new_name))) |
                                            (Book.author_for_search.like("%{}%".format(new_author)))).all()
     if not books:
@@ -311,7 +312,13 @@ def order():
 
 @app.route("/")
 def home_page():
-    return render_template("home.html", title="Главная страница")
+    db_sess = db_session.create_session()
+    pages = db_sess.query(Advertisement).filter(Advertisement.enabled == 1).all()
+    page = random.choice(pages)
+    print(page)
+    title = page.title
+    description = page.description
+    return render_template("home.html", title="Главная страница", ad_title=title, ad_description=description)
 
 
 @app.route("/books/<category>", methods=['POST', 'GET'])
@@ -412,6 +419,76 @@ def edit_books_form(book_id):
     return redirect('/')
 
 
+@app.route("/admin_pages", methods=['POST', 'GET'])
+@login_required
+def add_edit_delete_pages():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        pages = db_sess.query(Advertisement).all()
+        return render_template("page_vars.html", pages=pages, title="Реклама")
+    return redirect("/")
+
+
+@app.route("/add_page", methods=['POST', 'GET'])
+@login_required
+def add_page():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = AdvertisementForm()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            page = Advertisement()
+            page.title = form.title.data
+            page.description = form.description.data
+            page.enabled = form.enabled.data
+            db_sess.add(page)
+            db_sess.commit()
+            return redirect('/admin_pages')
+        return render_template('add_page.html',
+                               form=form, title="Добавление рекламы")
+    return redirect('/')
+
+
+@app.route("/delete_page/<int:page_id>", methods=['POST', 'GET'])
+@login_required
+def delete_page(page_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        page = db_sess.query(Advertisement).filter(Advertisement.id == page_id).first()
+        db_sess.delete(page)
+        db_sess.commit()
+        return redirect('/admin_pages')
+    return redirect('/')
+
+
+@app.route("/edit_page/<int:page_id>", methods=['POST', 'GET'])
+@login_required
+def edit_page(page_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = AdvertisementForm()
+        db_sess = db_session.create_session()
+        page = db_sess.query(Advertisement).filter(Advertisement.id == page_id).first()
+
+        if form.validate_on_submit():
+            page.title = form.title.data
+            page.description = form.description.data
+            page.enabled = form.enabled.data
+            db_sess.commit()
+            return redirect('/admin_pages')
+        return render_template('change_page.html',
+                               form=form, title="Изменение рекламы", page=page)
+    return redirect('/')
+
+
 @app.route("/add_admin", methods=['POST', 'GET'])
 @login_required
 def add_admin():
@@ -421,7 +498,7 @@ def add_admin():
     if user.is_admin:
         form = AdminForm()
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.id == form.id.data).first()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
         if form.validate_on_submit():
             user.is_admin = 1
             db_sess.commit()
@@ -438,6 +515,7 @@ def not_found():
 
 @app.errorhandler(Exception)
 def error(e):
+    print(e)
     return redirect('/not_found')
     # return make_response(jsonify({'error': 'Not found'}), 404)
 
