@@ -16,6 +16,35 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+@app.route('/admin/profiles', methods=['GET', 'POST'])
+def admin_profiles():
+    db_sess = db_session.create_session()
+    users = db_sess.query(User).all()
+    return render_template('admin_profiles.html', users=users)
+
+
+@app.route('/delete', methods=['POST'])
+def delete_entry():
+    db_sess = db_session.create_session()
+    # print(request.form['entry_id'])
+    db_sess.query(User).filter(User.id == int(request.form['entry_id'])).delete()
+
+    # db_sess.execute('delete User from users where id = ?'[int(request.form['entry_id'])])
+    db_sess.commit()
+    return redirect('/admin/profiles')
+
+
+@app.route('/levelup', methods=['POST'])
+def levelup():
+    db_sess = db_session.create_session()
+    print(request.form['entry_id'])
+    num_rows_updated = db_sess.query(User).filter(User.id == int(request.form['entry_id'])).update(
+        dict(is_admin=1))
+    print(' ')
+    db_sess.commit()
+    return redirect('/admin/profiles')
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -130,25 +159,30 @@ def profile():
         return redirect("/login")
 
 
+# @app.route('/levelup')
+# def levelup():
+#     db_sess = db_session.create_session()
+#     print(request.form['entry_id'])
+#     num_rows_updated = db_sess.query(User).filter(User.id == int(request.form['entry_id'])).update(
+#         dict(is_admin=1))
 
-@app.route("/book")
-@app.route("/item")
+@app.route("/book", methods=['POST'])
+@app.route("/item", methods=['POST'])
 def item():
-    return render_template('item.html', item='Name', author='Author', genres='genre1, genre2, genre3...',
-                           str_number='500',
-                           about_book='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. ')
+    db_sess = db_session.create_session()
+    item = db_sess.query(Book).filter(Book.id == int(request.form['entry_id'])).first()
+    # print(item.about)
+    return render_template('item.html', item=item)
 
-books = ['book1', 'book2']
+
+# books = ['book1', 'book2']
 @app.route("/")
 @app.route("/sort/genres")
 def genres():
+    db_sess = db_session.create_session()
+    books = db_sess.query(Book).all()
     # books = db_session.query(Book).all()
-    return render_template('genres.html', genre='Жанр', amount='amount', books=books, author='Пушкин', item='Евгений Онегин')
-
-
-
-
-
+    return render_template('genres.html', books=books)
 
 
 @app.route("/settings", methods=['POST', 'GET'])

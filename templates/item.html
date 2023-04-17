@@ -10,14 +10,13 @@
                 <div class="ribbon-left">Популярный</div>
                 <img class="cover shadow" src="/static/img/4824032.jpg" alt="">
                 <div class="item-info">
-                    <p class="fs-3">{{ item }}</p>
-                    <p class="fs-4">{{ author }}</p>
-                    <p class="fs-5">{{ genres }}</p>
-                    <p class="fs-5">Объем: {{ str_number }}</p>
+                    <p class="fs-3">{{ item.name }}</p>
+                    <p class="fs-4">{{  item.author }}</p>
+                    <p class="fs-5">{{  item.genres }}</p>
+                    <!-- <p class="fs-5">Объем: {{  item.str_number }}</p> -->
                     <p style="color: #656565;">
                     <p>Описание:</p>
-                    <p> {{ about_book }}</p>
-                    </p>
+                    <p> {{ item.about }}</p>
                 </div>
                 <button class="btn btn-primary custom-btn-class" style="margin-top: 2%; width: 30%;" type="submit">В
                     корзину</button>

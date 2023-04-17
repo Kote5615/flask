@@ -25,6 +25,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):  # надо обозна
     icon = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     sex = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    is_admin = sqlalchemy.Column(sqlalchemy.BOOLEAN, nullable=True)
 
 
 
