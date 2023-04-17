@@ -19,22 +19,27 @@
       {% if about != 'None' %}
       <p class="text-shifting-left">О себе: {{ about }} </p>
       {% else %}
-      <p class="text-shifting-left"> Вы ничего не рассказали о себе 🙁. Пожалуйста, <a href="/modify">заполните</a> ваш профиль.  </p>
+      <p class="text-shifting-left"> Вы еще не <a href="/modify">указали</a> адрес доставки.</p>
       {% endif %}
-      <button class="btn btn-danger end" type="submit">Оформить подписку</button>
+      <!-- <div class="end"> </div> -->
+      <!-- <button class="btn btn-danger end" type="submit">Оформить подписку</button> -->
     </div>
 
-  <div id="sidebarnext" class="rounding">
+  <!-- <div id="sidebarnext" class="rounding">
     <h4 class="fs-6 text-shifting-top text-center">Подписка: {{ sub }}</h4>
-  </div>
+  </div> -->
 
   <!-- <button type="button"  id="sidebarnext-nonback" class="btn btn-danger">Выйти из аккаунта</button> -->
   <a class="btn btn-danger" id="sidebarnext-nonback" href="/settings" role="button">Изменить профиль</a>
 
   <a class="btn btn-danger" id="sidebarnext-nonback" href="/logout" role="button">Выйти из аккаунта</a>
-
-
   <div id="clear">
+  <div>
+  <a class="btn btn-danger"  href="/admin/profiles" style="
+  margin-top: 20px; margin-left: 1%; max-width: 18%;" role="button">Управлять учетными записями пользователей</a>
+</div>
+
+ 
 
   </div>
 

@@ -21,6 +21,35 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+@app.route('/admin/profiles', methods=['GET', 'POST'])
+def admin_profiles():
+    db_sess = db_session.create_session()
+    users = db_sess.query(User).all()
+    return render_template('admin_profiles.html', users=users)
+
+
+@app.route('/delete', methods=['POST'])
+def delete_entry():
+    db_sess = db_session.create_session()
+    # print(request.form['entry_id'])
+    db_sess.query(User).filter(User.id == int(request.form['entry_id'])).delete()
+
+    # db_sess.execute('delete User from users where id = ?'[int(request.form['entry_id'])])
+    db_sess.commit()
+    return redirect('/admin/profiles')
+
+
+@app.route('/levelup', methods=['POST'])
+def levelup():
+    db_sess = db_session.create_session()
+    print(request.form['entry_id'])
+    num_rows_updated = db_sess.query(User).filter(User.id == int(request.form['entry_id'])).update(
+        dict(is_admin=1))
+    print(' ')
+    db_sess.commit()
+    return redirect('/admin/profiles')
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
