@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 align="center">
+    <br>
+  {{title}}<br>
+    <br>
+</h2>
+
+<div class="container-fluid">
+  <div class="row row-cols-10 g-0">
+    <div class="col">
+        <div class="p-3 border bg-light">Заголовок</div>
+    </div>
+      <div class="col">
+     <div class="p-3 border bg-light">Описание</div>
+    </div>
+      <div class="col">
+     <div class="p-3 border bg-light">Используется</div>
+    </div>
+      <div class="col">
+     <div class="p-3 border bg-light">Действия</div>
+    </div>
+   </div>
+  </div>
+<div class="container-fluid">
+{% for item in pages %}
+  <div class="row row-cols-10 g-0">
+    <div class="col">
+     <div class="p-3 border bg-light">{{item.title}}</div>
+    </div>
+      <div class="col">
+          <div class="p-3 border bg-light">{{item.description}}</div>
+    </div>
+      <div class="col">
+     <div class="p-3 border bg-light">{{item.enabled}}</div>
+    </div>
+      <div class="col">
+        <form action="/edit_page/{{item.id}}" method="POST">
+            <input type="submit" class="btn btn-outline-success btn-sm" value="Отредактировать">
+        </form>
+          <form action="/delete_page/{{item.id}}" method="POST">
+            <input type="submit" class="btn btn-outline-danger btn-sm" value="Удалить">
+        </form>
+    </div>
+   </div>
+{% endfor %}
+</div>
+<br>
+<br>
+<div align="center">
+    <form action="/add_page" method="POST">
+        <input type="submit" class="btn btn-outline-primary" value="Добавить вариант интерфейса">
+    </form>
+</div>
+
+
+{% endblock %}
