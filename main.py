@@ -139,8 +139,9 @@ def profile():
 def item(index):
     db_sess = db_session.create_session()
     book = db_sess.query(Book).get(index)
+    image = "prototype.jpg"
     return render_template('item.html', book=book,
-                           about_book='Добавить описание')
+                           about_book='Добавить описание', image=image)
 
 
 @app.route("/settings", methods=['POST', 'GET'])
