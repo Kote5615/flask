@@ -16,7 +16,7 @@
                     <p class="fs-5">Цена: {{ book.price }}</p>
                     <p style="color: #656565;">
                     <p>Описание:</p>
-                    <p> {{ about_book }}</p>
+                    <p>{{ book.about }}</p>
                     <div class="status">
                     <form action="/add_to_basket/{{book.id}}/{{book.author}}/{{book.name}}/item" method="POST">
                         <input type="submit" class="btn btn-outline-success" value="Добавить в корзину">

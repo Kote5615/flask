@@ -17,3 +17,4 @@ class Book(SqlAlchemyBase, UserMixin, SerializerMixin):
     quantity = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    about = sqlalchemy.Column(sqlalchemy.String, nullable=True)

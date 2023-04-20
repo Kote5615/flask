@@ -169,8 +169,7 @@ def item(index):
     db_sess = db_session.create_session()
     book = db_sess.query(Book).get(index)
     image = "prototype.jpg"
-    return render_template('item.html', book=book,
-                           about_book='Добавить описание', image=image)
+    return render_template('item.html', book=book, image=image)
 
 
 @app.route("/settings", methods=['POST', 'GET'])
@@ -395,11 +394,14 @@ def add_books_form():
             db_sess = db_session.create_session()
             book = Book()
             book.name = form.name.data
+            book.name_for_search = form.name_for_search.data
+            book.author = form.author.data
+            book.author_for_search = form.author_for_search.data
             book.price = form.price.data
             book.quantity = form.quantity.data
-            book.author = form.author.data
             book.genre = form.genre.data
             book.category = form.category.data
+            book.about = form.about.data
             db_sess.add(book)
             db_sess.commit()
             return redirect('/admin')
@@ -437,11 +439,15 @@ def edit_books_form(book_id):
         book = db_sess.query(Book).filter(Book.id == book_id).first()
         if form.validate_on_submit():
             book.name = form.name.data
+            book.name_for_search = form.name_for_search.data
+            book.author = form.author.data
+            book.author_for_search = form.author_for_search.data
             book.price = form.price.data
             book.quantity = form.quantity.data
-            book.author = form.author.data
             book.genre = form.genre.data
             book.category = form.category.data
+            book.about = form.about.data
+            print(book.about)
             db_sess.commit()
             return redirect('/admin')
         return render_template('edit_book_form.html',
@@ -519,23 +525,23 @@ def edit_page(page_id):
     return redirect('/')
 
 
-@app.route("/add_admin", methods=['POST', 'GET'])
-@login_required
-def add_admin():
-    user_id = current_user.get_id()
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == user_id).first()
-    if user.is_admin:
-        form = AdminForm()
-        db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
-        if form.validate_on_submit():
-            user.is_admin = 1
-            db_sess.commit()
-            return redirect('/')
-        return render_template('add_admin.html',
-                               form=form, title="Добавление администратора")
-    return redirect('/')
+# @app.route("/add_admin", methods=['POST', 'GET'])
+# @login_required
+# def add_admin():
+#     user_id = current_user.get_id()
+#     db_sess = db_session.create_session()
+#     user = db_sess.query(User).filter(User.id == user_id).first()
+#     if user.is_admin:
+#         form = AdminForm()
+#         db_sess = db_session.create_session()
+#         user = db_sess.query(User).filter(User.email == form.email.data).first()
+#         if form.validate_on_submit():
+#             user.is_admin = 1
+#             db_sess.commit()
+#             return redirect('/')
+#         return render_template('add_admin.html',
+#                                form=form, title="Добавление администратора")
+#     return redirect('/')
 
 
 @app.route("/not_found")
@@ -543,11 +549,11 @@ def not_found():
     return render_template('not_found.html')
 
 
-@app.errorhandler(Exception)
-def error(e):
-    print(e)
-    return redirect('/not_found')
-    # return make_response(jsonify({'error': 'Not found'}), 404)
+# @app.errorhandler(Exception)
+# def error(e):
+#     print(e)
+#     return redirect('/not_found')
+#     # return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 def main():

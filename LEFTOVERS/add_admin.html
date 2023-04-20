@@ -21,3 +21,11 @@
 </div>
 
 {% endblock %}
+
+
+
+{% if not book.about %}
+                    <p>Нет описания</p>
+                    {% else %}
+                    <p>{{ book.about }}</p>
+                    {% endif %}
