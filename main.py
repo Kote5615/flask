@@ -549,11 +549,11 @@ def not_found():
     return render_template('not_found.html')
 
 
-# @app.errorhandler(Exception)
-# def error(e):
-#     print(e)
-#     return redirect('/not_found')
-#     # return make_response(jsonify({'error': 'Not found'}), 404)
+@app.errorhandler(Exception)
+def error(e):
+    print(e)
+    return redirect('/not_found')
+    # return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 def main():
