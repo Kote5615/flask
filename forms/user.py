@@ -21,9 +21,10 @@ class LoginForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    name = TextAreaField('Название', validators=[DataRequired()])
-    author = TextAreaField('Автор', validators=[DataRequired()])
+    name = TextAreaField('Название', default="#")
+    author = TextAreaField('Автор', default="#")
     submit = SubmitField('Поиск')
+
 
 class SettingsForm(FlaskForm):
     name = StringField('Имя пользователя', validators=[DataRequired()])
@@ -31,3 +32,25 @@ class SettingsForm(FlaskForm):
     submit = SubmitField('Сохранить изменения')
 
 
+class BookForm(FlaskForm):
+    name = StringField('Название книги', validators=[DataRequired()])
+    name_for_search = StringField('Название для поиска', validators=[DataRequired()])
+    author = StringField('Автор', validators=[DataRequired()])
+    author_for_search = StringField('Автор для поиска', validators=[DataRequired()])
+    price = StringField('Цена', validators=[DataRequired()])
+    quantity = StringField('Количество', validators=[DataRequired()])
+    genre = StringField('Жанр', validators=[DataRequired()])
+    category = StringField('Категория', validators=[DataRequired()])
+    submit = SubmitField('Добавить книгу в каталог')
+
+
+class AdminForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Добавить администратора')
+
+
+class AdvertisementForm(FlaskForm):
+    title = StringField('Заголовок', validators=[DataRequired()])
+    description = StringField("Описание", validators=[DataRequired()])
+    enabled = BooleanField("Используется")
+    submit = SubmitField('Сохранить изменения')

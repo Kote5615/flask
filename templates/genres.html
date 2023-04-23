@@ -10,17 +10,19 @@
             <hr class="bg-danger border-top border-dark">
             {% for item in books %}
             <div class="otstupbottom">
-                <img class="shadow cover-search" src="/static/img/4824032.jpg" alt="">
+                <img class="shadow cover-search" src="{{ item.icon }}" alt="">
                 <div class="item-info">
                     <p class="fs-5">{{ item.name }}</p>
                     <p class="fs-5" style="color: #9197a3;">{{ author }}</p>
                     <p class="fs-7">{{ item.genre }}</p>
-                    <p class="fs-7">{{ item.about }}</p>
-                    <p style="color: #656565;">
-                    <form target="_blank" action="/item" method=post class=item>
-                        <input type="hidden" name="entry_id" value="{{ item.id }}">
-                        <input type="submit" class="btn btn-danger" value="Узнать больше" />
-                    </form>
+                    {% if item.about != None %}
+                        <p> {{ item.about }}</p>
+                    {% endif %}
+                    <a href="/item/{{ item.id }}" class="btn btn-danger">Узнать больше</a>
+<!--                    <form target="_blank" action="/item/{{ item.id }}" method=post class=item>-->
+<!--&lt;!&ndash;                        <input type="hidden" name="entry_id" value="{{ item.id }}">&ndash;&gt;-->
+<!--                        <input type="submit" class="btn btn-danger" value="Узнать больше" />-->
+<!--                    </form>-->
 
                 </div>
                 <hr class="bg-danger border-top border-dark">

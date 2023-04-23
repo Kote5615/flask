@@ -1,16 +1,23 @@
+import random
+
 from flask import Flask, render_template, redirect, request
 from data import db_session
+from data.page import Advertisement
 from data.users import User
 from data.books import Book
 from data.user_purchases import Purchase
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
-from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm
+from forms.user import RegisterForm, LoginForm, SearchForm, SettingsForm, BookForm, AdminForm, \
+    AdvertisementForm
 import calendar
+from translator import translate
 
 UPLOAD_FOLDER = 'static/icons/'
+UPLOAD_FOLDER_COVER = 'static/img/'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER_COVER'] = UPLOAD_FOLDER_COVER
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -18,9 +25,14 @@ login_manager.init_app(app)
 
 @app.route('/admin/profiles', methods=['GET', 'POST'])
 def admin_profiles():
+    user_id = current_user.get_id()
     db_sess = db_session.create_session()
-    users = db_sess.query(User).all()
-    return render_template('admin_profiles.html', users=users)
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        users = db_sess.query(User).all()
+        return render_template('admin_profiles.html', users=users)
+    else:
+        return redirect('/')
 
 
 @app.route('/delete', methods=['POST'])
@@ -159,30 +171,16 @@ def profile():
         return redirect("/login")
 
 
-# @app.route('/levelup')
-# def levelup():
-#     db_sess = db_session.create_session()
-#     print(request.form['entry_id'])
-#     num_rows_updated = db_sess.query(User).filter(User.id == int(request.form['entry_id'])).update(
-#         dict(is_admin=1))
-
-@app.route("/book", methods=['POST'])
-@app.route("/item", methods=['POST'])
-def item():
+@app.route("/item/<index>")
+def item(index):
     db_sess = db_session.create_session()
-    item = db_sess.query(Book).filter(Book.id == int(request.form['entry_id'])).first()
+    book = db_sess.query(Book).get(index)
+    print(index)
+    print(book.name)
+    # item = db_sess.query(Book).filter(Book.id == int(request.form['entry_id'])).first()
     # print(item.about)
-    return render_template('item.html', item=item)
-
-
-# books = ['book1', 'book2']
-@app.route("/")
-@app.route("/sort/genres")
-def genres():
-    db_sess = db_session.create_session()
-    books = db_sess.query(Book).all()
-    # books = db_session.query(Book).all()
-    return render_template('genres.html', books=books)
+    # return render_template('item.html', item=item)
+    return render_template('item.html', book=book)
 
 
 @app.route("/settings", methods=['POST', 'GET'])
@@ -226,9 +224,9 @@ def settings():
         return redirect("/login")
 
 
-@app.route('/add_to_basket/<index>/<author>/<name>', methods=['POST'])
+@app.route('/add_to_basket/<index>/<author>/<name>/<status>', methods=['POST'])
 @login_required
-def add_to_basket(index, author, name):
+def add_to_basket(index, author, name, status):
     db_sess = db_session.create_session()
     book = db_sess.query(Book).get(index)
     purchase = db_sess.query(Purchase).filter((Purchase.user_id == current_user.get_id()),
@@ -245,7 +243,12 @@ def add_to_basket(index, author, name):
             )
             db_sess.add(purchase)
     db_sess.commit()
-    return search_results(author, name)
+    if status == "from_search":
+        return search_results(author, name)
+    elif status == "item":
+        return item(index)
+    else:
+        return sort_by_genre(status)
 
 
 @app.route('/change_quantity/<index>/<operation>', methods=['POST'])
@@ -273,29 +276,39 @@ def change_quantity(index, operation):
 def search_form():
     form = SearchForm()
     if form.validate_on_submit():
-        print(form.name.data, form.author.data)
-        # return redirect('/results/<{}>/<{}>'.format(form.author.data, form.name.data))
-        return search_results(form.author.data, form.name.data)
+        name = "".join(form.name.data.lower().split())
+        author = "".join(form.author.data.lower().split())
+        return search_results(author, name)
     return render_template('search.html', form=form)
 
 
-@app.route('/results/', methods=['GET', 'POST'])
+@app.route('/results', methods=['GET', 'POST'])
 def search_results(author, name):
     db_sess = db_session.create_session()
-    books = db_sess.query(Book).filter((Book.name == name),
-                                       (Book.author == author)).all()
-    # print(books)
+    print(author, name)
+    # return render_template('item.html', books=books)
+    books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(name))) |
+                                       (Book.author_for_search.like("%{}%".format(author)))).all()
+
+    if not books:
+        new_author = "".join([translate[i] if i in translate.keys() else i for i in author])
+        new_name = "".join([translate[i] if i in translate.keys() else i for i in name])
+        books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(new_name))) |
+                                           (Book.author_for_search.like("%{}%".format(new_author)))).all()
     if not books:
         books = db_sess.query(Book).all()
-        return render_template("results.html", title1="Ничего не найдено",
-                               title2="Ознакомьтесь с нашим каталогом", books=books,
-                               author=author, name=name)
+        return render_template('genres.html', books=books)
+        # return render_template("results.html", title1="Ничего не найдено",
+        #                        title2="Ознакомьтесь с нашим каталогом", books=books,
+        #                        author=author, name=name)
     if len(books) == 1:
-        return render_template("results.html", title1="Результаты поиска", item=books[0],
-                               author=author, name=name)
+        return render_template('genres.html', books=books)
+        # return render_template("results.html", title1="Результаты поиска", item=books[0],
+        #                        author=author, name=name)
     if len(books) > 1:
-        return render_template("results.html", title1="Результаты поиска", books=books,
-                               author=author, name=name)
+        return render_template('genres.html', books=books)
+        # return render_template("results.html", title1="Результаты поиска", books=books,
+        #                        author=author, name=name)
 
 
 @app.route('/basket', methods=['POST', 'GET'])
@@ -305,6 +318,8 @@ def basket():
     db_sess = db_session.create_session()
     purchases = db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).all()
     checkout = {}
+    address = db_sess.query(User).filter(User.id == user_current_id).first().about
+
     if purchases:
         counter = 0
         if len(purchases) > 1:
@@ -316,9 +331,9 @@ def basket():
             q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
             checkout = {q: purchases[0].quantity}
             counter = q.price * purchases[0].quantity
-        # print(checkout)
-        return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter)
-    return render_template("basket.html", title="Корзина")
+        return render_template("basket.html", title="Корзина", checkout=checkout, counter=counter,
+                               address=address)
+    return render_template("basket.html", title="Корзина", address=address)
 
 
 @app.route('/order', methods=['POST', 'GET'])
@@ -331,26 +346,266 @@ def order():
         for el in purchases:
             q = db_sess.query(Book).filter(el.book_id == Book.id).first()
             q.quantity -= el.quantity
-            if q.quantity == 0:
-                q.is_available = 0
     else:
         q = db_sess.query(Book).filter(purchases[0].book_id == Book.id).first()
         q.quantity -= purchases[0].quantity
-        if q.quantity == 0:
-            q.is_available = 0
     db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).delete()
     db_sess.commit()
     return render_template("base.html", title="Ваш заказ успешно оформлен")
 
 
+@app.route("/")
+def home_page():
+    db_sess = db_session.create_session()
+    pages = db_sess.query(Advertisement).filter(Advertisement.enabled == 1).all()
+    page = random.choice(pages)
+    print(page)
+    title = page.title
+    description = page.description
+    return render_template("home.html", title="Главная страница", ad_title=title, ad_description=description)
+
+
+@app.route("/books/<category>", methods=['POST', 'GET'])
+def sort_by_genre(category):
+    db_sess = db_session.create_session()
+    if category == "all":
+        books = db_sess.query(Book).all()
+        return render_template('genres.html', books=books)
+        # return render_template("results.html", title1="Каталог", books=books, genre=category)
+    books = db_sess.query(Book).filter(Book.category == category).all()
+    for i in books:
+        print(i.id)
+    return render_template('genres.html', books=books)
+    # return render_template("results.html", title1="Книги жанра «{}»".format(category.capitalize()),
+    #                        books=books, genre=category)
+
+
+@app.route("/author/<author>", methods=['POST', 'GET'])
+def sort_by_author(author):
+    db_sess = db_session.create_session()
+    books = db_sess.query(Book).filter(Book.author_for_search == author).all()
+    full_name = db_sess.query(Book).filter(Book.author_for_search == author).first().author
+    return render_template('genres.html', books=books)
+    # return render_template("results.html", title1="Книги автора «{}»".format(full_name),
+    #                        books=books)
+
+
+@app.route("/admin", methods=['POST', 'GET'])
+@login_required
+def add_edit_delete_books():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        books = db_sess.query(Book).all()
+        return render_template("admin_rights.html", books=books, title="Изменение каталога")
+    return redirect("/")
+
+
+@app.route("/add_form", methods=['POST', 'GET'])
+@login_required
+def add_books_form():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        db_sess = db_session.create_session()
+        form = BookForm()
+        # if request.method == 'POST':
+        #     book = Book()
+        #     print('yes')
+        #     f = request.files['file']
+        #     print(str(f))
+        #     filename = f'{str(form.name.data)}.jpg'
+        #     print(str(filename))
+        #     f.save(app.config['UPLOAD_FOLDER_COVER'] + filename)
+        #     # num_rows_updated = db_sess.query(Book).filter(Book.id == current_user.get_id()).update(
+        #     #     dict(icon=filename))
+        #     book.icon = f'static/icons/{filename}'
+        #     db_sess.add(book)
+        #     db_sess.commit()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            book = Book()
+            book.name = form.name.data
+            book.price = form.price.data
+            book.quantity = form.quantity.data
+            book.author = form.author.data
+            book.genre = form.genre.data
+            book.category = form.category.data
+            f = request.files['file']
+            if ' ' == str(f)[16]:
+                filename = 'prototype.jpg'
+            else:
+                filename = f'{str(form.name.data)}.jpg'
+            f.save(app.config['UPLOAD_FOLDER_COVER'] + filename)
+            # num_rows_updated = db_sess.query(Book).filter(Book.id == current_user.get_id()).update(
+            #     dict(icon=filename))
+            book.icon = f'/static/img/{filename}'
+            db_sess.add(book)
+            db_sess.commit()
+            return redirect('/admin')
+        return render_template('add_book_form.html',
+                               form=form, title="Добавление книги")
+    return redirect('/')
+
+
+@app.route("/delete/<int:book_id>", methods=['POST', 'GET'])
+@login_required
+def delete_book(book_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        book = db_sess.query(Book).filter(Book.id == book_id).first()
+        db_sess.delete(book)
+        purchases = db_sess.query(Purchase).filter(Purchase.book_id == book_id).all()
+        for i in purchases:
+            db_sess.delete(i)
+        db_sess.commit()
+        return redirect('/admin')
+    return redirect('/')
+
+
+@app.route("/edit/<int:book_id>", methods=['POST', 'GET'])
+@login_required
+def edit_books_form(book_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = BookForm()
+        db_sess = db_session.create_session()
+        book = db_sess.query(Book).filter(Book.id == book_id).first()
+        if form.validate_on_submit():
+            book.name = form.name.data
+            book.price = form.price.data
+            book.quantity = form.quantity.data
+            book.author = form.author.data
+            book.genre = form.genre.data
+            book.category = form.category.data
+            f = request.files['file']
+            print(str(f)[16], 16)
+            if ' ' == str(f)[16]:
+                filename = 'prototype.jpg'
+            else:
+                filename = f'{str(form.name.data)}.jpg'
+            f.save(app.config['UPLOAD_FOLDER_COVER'] + filename)
+            book.icon = f'/static/img/{filename}'
+            db_sess.commit()
+            return redirect('/admin')
+        return render_template('edit_book_form.html',
+                               form=form, title="Редактирование книги", book=book)
+    return redirect('/')
+
+
+@app.route("/admin_pages", methods=['POST', 'GET'])
+@login_required
+def add_edit_delete_pages():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        pages = db_sess.query(Advertisement).all()
+        return render_template("page_vars.html", pages=pages, title="Реклама")
+    return redirect("/")
+
+
+@app.route("/add_page", methods=['POST', 'GET'])
+@login_required
+def add_page():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = AdvertisementForm()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            page = Advertisement()
+            page.title = form.title.data
+            page.description = form.description.data
+            page.enabled = form.enabled.data
+            db_sess.add(page)
+            db_sess.commit()
+            return redirect('/admin_pages')
+        return render_template('add_page.html',
+                               form=form, title="Добавление рекламы")
+    return redirect('/')
+
+
+@app.route("/delete_page/<int:page_id>", methods=['POST', 'GET'])
+@login_required
+def delete_page(page_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        page = db_sess.query(Advertisement).filter(Advertisement.id == page_id).first()
+        db_sess.delete(page)
+        db_sess.commit()
+        return redirect('/admin_pages')
+    return redirect('/')
+
+
+@app.route("/edit_page/<int:page_id>", methods=['POST', 'GET'])
+@login_required
+def edit_page(page_id):
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = AdvertisementForm()
+        db_sess = db_session.create_session()
+        page = db_sess.query(Advertisement).filter(Advertisement.id == page_id).first()
+
+        if form.validate_on_submit():
+            page.title = form.title.data
+            page.description = form.description.data
+            page.enabled = form.enabled.data
+            db_sess.commit()
+            return redirect('/admin_pages')
+        return render_template('change_page.html',
+                               form=form, title="Изменение рекламы", page=page)
+    return redirect('/')
+
+
+@app.route("/add_admin", methods=['POST', 'GET'])
+@login_required
+def add_admin():
+    user_id = current_user.get_id()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    if user.is_admin:
+        form = AdminForm()
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if form.validate_on_submit():
+            user.is_admin = 1
+            db_sess.commit()
+            return redirect('/')
+        return render_template('add_admin.html',
+                               form=form, title="Добавление администратора")
+    return redirect('/')
+
+
+@app.route("/not_found")
+def not_found():
+    return render_template('not_found.html')
+
+
+@app.errorhandler(Exception)
+def error(e):
+    print(e)
+    return redirect('/not_found')
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
 def main():
-    # bd = input()
     db_session.global_init(f"db/db.db")
     user = User()
     db_sess = db_session.create_session()
     user = db_sess.query(User).first()
-    # for user in db_sess.query(User).all():
-    #     print(user)
+
 
     app.run()
 

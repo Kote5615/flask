@@ -19,15 +19,13 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):  # надо обозна
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     reg_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                      default=datetime.datetime.now, autoincrement=True)
+                                 default=datetime.datetime.now, autoincrement=True)
     subscribe = sqlalchemy.Column(sqlalchemy.BOOLEAN,
-                                      default=False, autoincrement=True)
+                                  default=False, autoincrement=True)
     icon = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     sex = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     is_admin = sqlalchemy.Column(sqlalchemy.BOOLEAN, nullable=True)
-
-
 
     # устанавливает значение хэша пароля для переданной строки
     def set_password(self, password):

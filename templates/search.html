@@ -1,13 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="" method="post">
+
+<br>
+<br>
+<div class="container border border-primary border border-2 rounded">
+    <br>
+    <div class="row">
+        <div class="col">
+            <form action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.name.label }}<br>
     {{ form.name(class="form-control", type="text") }}<br>
     {{ form.author.label }}<br>
     {{ form.author(class="form-control", type="text") }}<br>
-    {{ form.submit(type="submit", class="btn btn-outline-success") }}
+    <div align="center">{{ form.submit(type="submit", class="btn btn-outline-primary") }}</div>
+                <br>
+    </div>
+        </div>
 
 </form>
+</div>
+
 {% endblock %}

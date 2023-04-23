@@ -34,10 +34,12 @@
 
   <a class="btn btn-danger" id="sidebarnext-nonback" href="/logout" role="button">Выйти из аккаунта</a>
   <div id="clear">
-  <div>
-  <a class="btn btn-danger"  href="/admin/profiles" style="
-  margin-top: 20px; margin-left: 1%; max-width: 18%;" role="button">Управлять учетными записями пользователей</a>
-</div>
+    {% if current_user.is_admin %}
+      <div>
+      <a class="btn btn-danger"  href="/admin/profiles" style="
+      margin-top: 20px; margin-left: 1%; max-width: 18%;" role="button">Управлять учетными записями пользователей</a>
+    </div>
+    {% endif %}
 
  
 

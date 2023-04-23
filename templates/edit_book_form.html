@@ -9,29 +9,35 @@
     <br>
     <div class="row">
         <div class="col">
-            <form action="" method="post">
-    {{ form.hidden_tag() }}
-    {{ form.name.label }}<br>
-    {{ form.name(class="form-control", type="text", value=book.name) }}<br>
-    {{ form.name_for_search.label }}<br>
-    {{ form.name_for_search(class="form-control", type="text", value=book.name_for_search) }}<br>
-    {{ form.author.label }}<br>
-    {{ form.author(class="form-control", type="text", value=book.author) }}<br>
-    {{ form.author_for_search.label }}<br>
-    {{ form.author_for_search(class="form-control", type="text", value=book.author_for_search) }}<br>
-    {{ form.price.label }}<br>
-    {{ form.price(class="form-control", type="text", value=book.price) }}<br>
-    {{ form.quantity.label }}<br>
-    {{ form.quantity(class="form-control", type="text", value=book.quantity) }}<br>
-    {{ form.genre.label }}<br>
-    {{ form.genre(class="form-control", type="text", value=book.genre) }}<br>
-    {{ form.category.label }}<br>
-    {{ form.category(class="form-control", type="text", value=book.category) }}<br>
-    <div align="center">{{ form.submit(type="submit", class="btn btn-outline-primary") }}</div>
-                <br>
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group otstupbottom">
+                    <label for="photo">Загрузите обложку</label>
+                    <input type="file" class="form-control-file" id="photo" name="file">
+                </div>
+                <form action="" method="post">
+
+                    {{ form.hidden_tag() }}
+                    {{ form.name.label }}<br>
+                    {{ form.name(class="form-control", type="text", value=book.name) }}<br>
+                    {{ form.name_for_search.label }}<br>
+                    {{ form.name_for_search(class="form-control", type="text", value=book.name_for_search) }}<br>
+                    {{ form.author.label }}<br>
+                    {{ form.author(class="form-control", type="text", value=book.author) }}<br>
+                    {{ form.author_for_search.label }}<br>
+                    {{ form.author_for_search(class="form-control", type="text", value=book.author_for_search) }}<br>
+                    {{ form.price.label }}<br>
+                    {{ form.price(class="form-control", type="text", value=book.price) }}<br>
+                    {{ form.quantity.label }}<br>
+                    {{ form.quantity(class="form-control", type="text", value=book.quantity) }}<br>
+                    {{ form.genre.label }}<br>
+                    {{ form.genre(class="form-control", type="text", value=book.genre) }}<br>
+                    {{ form.category.label }}<br>
+                    {{ form.category(class="form-control", type="text", value=book.category) }}<br>
+                    <div align="center">{{ form.submit(type="submit", class="btn btn-outline-primary") }}</div>
+                    <br>
                 </form>
-    </div>
         </div>
+    </div>
 
 </div>
 
