@@ -431,6 +431,8 @@ def add_books_form():
             book.price = form.price.data
             book.quantity = form.quantity.data
             book.author = form.author.data
+            book.author_for_search = form.author_for_search.data
+            book.name_for_search = form.name_for_search.data
             book.genre = form.genre.data
             book.category = form.category.data
             f = request.files['file']
@@ -481,6 +483,8 @@ def edit_books_form(book_id):
             book.name = form.name.data
             book.price = form.price.data
             book.quantity = form.quantity.data
+            book.author_for_search = form.author_for_search.data
+            book.name_for_search = form.name_for_search.data
             book.author = form.author.data
             book.genre = form.genre.data
             book.category = form.category.data
