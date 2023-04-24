@@ -244,7 +244,7 @@ def add_to_basket(index, author, name, status):
             db_sess.add(purchase)
     db_sess.commit()
     if status == "from_search":
-        return search_results(author, name)
+        return redirect('/results/{}/{}'.format(author, name))
     elif status == "item":
         return item(index)
     else:
@@ -282,9 +282,13 @@ def search_form():
     return render_template('search.html', form=form)
 
 
-@app.route('/results', methods=['GET', 'POST'])
+@app.route('/results/<author>/<name>', methods=['GET', 'POST'])
 def search_results(author, name):
     db_sess = db_session.create_session()
+    if author == " " or author == "":
+        author = "author"
+    if name == " " or name == "":
+        name = "name"
     print(author, name)
     # return render_template('item.html', books=books)
     books = db_sess.query(Book).filter((Book.name_for_search.like("%{}%".format(name))) |
@@ -351,7 +355,7 @@ def order():
         q.quantity -= purchases[0].quantity
     db_sess.query(Purchase).filter(Purchase.user_id == user_current_id).delete()
     db_sess.commit()
-    return render_template("base.html", title="Ваш заказ успешно оформлен")
+    return render_template("order.html", headline="Ваш заказ успешно оформлен")
 
 
 @app.route("/")
@@ -601,7 +605,6 @@ def not_found():
 def error(e):
     print(e)
     return redirect('/not_found')
-    return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 def main():
@@ -609,7 +612,6 @@ def main():
     user = User()
     db_sess = db_session.create_session()
     user = db_sess.query(User).first()
-
 
     app.run()
 
