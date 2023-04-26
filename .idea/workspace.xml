@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e3285949-14ba-41e7-b1f2-387e2d3518a0" name="Changes" comment="изменен base.html, страница пользователя в работе">
+    <list default="true" id="e3285949-14ba-41e7-b1f2-387e2d3518a0" name="Changes" comment="fixed some more bugs">
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/db.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/img/prototype.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/img/prototype.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/test.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/icons/admin@gmail.com.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/icons/temari@suna.org.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/icons0cf1927d27d8bb8cdee457ce110a771d.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/01_1737965.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/12.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/3973356_828186.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/6392169f43cbc95d47ce1986d9ac06f7.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/asf.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/book11.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/book22.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/book33.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/p2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/poselok_img.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/prototype.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/Человек-амфибия.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/result.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +133,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679762035500</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fixed some more bugs">
+      <created>1682509860288</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1682509860288</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -137,6 +159,7 @@
     <MESSAGE value="." />
     <MESSAGE value="изменен base.html, страгица пользователя в работе" />
     <MESSAGE value="изменен base.html, страница пользователя в работе" />
-    <option name="LAST_COMMIT_MESSAGE" value="изменен base.html, страница пользователя в работе" />
+    <MESSAGE value="fixed some more bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed some more bugs" />
   </component>
 </project>
