@@ -439,6 +439,7 @@ def add_books_form():
             book.name_for_search = form.name_for_search.data
             book.genre = form.genre.data
             book.category = form.category.data
+            book.about = book.about.data
             f = request.files['file']
             if ' ' == str(f)[16]:
                 filename = 'prototype.jpg'
@@ -492,14 +493,15 @@ def edit_books_form(book_id):
             book.author = form.author.data
             book.genre = form.genre.data
             book.category = form.category.data
+            book.about = form.about.data
             f = request.files['file']
             print(str(f)[16], 16)
             if ' ' == str(f)[16]:
-                filename = 'prototype.jpg'
+                pass
             else:
                 filename = f'{str(form.name.data)}.jpg'
-            f.save(app.config['UPLOAD_FOLDER_COVER'] + filename)
-            book.icon = f'/static/img/{filename}'
+                f.save(app.config['UPLOAD_FOLDER_COVER'] + filename)
+                book.icon = f'/static/img/{filename}'
             db_sess.commit()
             return redirect('/admin')
         return render_template('edit_book_form.html',
@@ -601,10 +603,10 @@ def not_found():
     return render_template('not_found.html')
 
 
-@app.errorhandler(Exception)
-def error(e):
-    print(e)
-    return redirect('/not_found')
+# @app.errorhandler(Exception)
+# def error(e):
+#     print(e)
+#     return redirect('/not_found')
 
 
 def main():
