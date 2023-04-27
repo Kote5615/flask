@@ -603,10 +603,10 @@ def not_found():
     return render_template('not_found.html')
 
 
-# @app.errorhandler(Exception)
-# def error(e):
-#     print(e)
-#     return redirect('/not_found')
+@app.errorhandler(Exception)
+def error(e):
+    print(e)
+    return redirect('/not_found')
 
 
 def main():
